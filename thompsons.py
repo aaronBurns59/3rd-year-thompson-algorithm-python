@@ -15,7 +15,8 @@ class NFA:
     #Constructor for the NFA class
     #self references the current instance of the class
     #self has to be called first and is not needed to create an instance of the class
-    def _init_(self, initial, accept):
+    #NB!!! must have 2 underscores at each side for constructor to take in args properly
+    def __init__(self, initial, accept):
         #self.initial/accept is the class var after = is the local var
         self.initial=initial
         self.accept=accept
@@ -31,11 +32,10 @@ def compile(postfix):
             nfa1= nfaStack.pop()
             #combine the two states together
             nfa1.accept.edge1 = nfa2.initial
-            #Create a new NFA using new intial and accept states
-            newNFA = NFA(nfa1.initial, nfa2.accept)
             #push a new nfa onto the stack that is a combinaton of the two nfa's that were on the stack
             #which is what the . means 'Concatenate'
             #push the '.' nfa to the stack
+            newNFA = NFA(nfa1.initial, nfa2.accept)
             nfaStack.append(newNFA)
         elif c == '|':
             #doesn't matter what order they are popped of for the or operator
@@ -89,5 +89,7 @@ def compile(postfix):
             #nfa constructor to create an nfa for a non special character
             newNFA = NFA(initial, accept)
             nfaStack.append(newNFA)
+    return nfaStack.pop()
 
-print('WORKS')
+print(compile('ab.cd.|'))
+print(compile('aa.*'))
