@@ -12,7 +12,6 @@ class state:
 class NFA: 
     initial = None
     accept = None
-
     #Constructor for the NFA class
     #self references the current instance of the class
     #self has to be called first and is not needed to create an instance of the class
@@ -32,10 +31,12 @@ def compile(postfix):
             nfa1= nfaStack.pop()
             #combine the two states together
             nfa1.accept.edge1 = nfa2.initial
+            #Create a new NFA using new intial and accept states
+            newNFA = NFA(nfa1.initial, nfa2.accept)
             #push a new nfa onto the stack that is a combinaton of the two nfa's that were on the stack
             #which is what the . means 'Concatenate'
             #push the '.' nfa to the stack
-            nfaStack.append(nfa1.initial, nfa2.accept)
+            nfaStack.append(newNFA)
         elif c == '|':
             #doesn't matter what order they are popped of for the or operator
             nfa2= nfaStack.pop()
@@ -52,14 +53,14 @@ def compile(postfix):
             #just like the drawn out example on paper
             #for the or operator you put a new initial and accept state for whatever nfas you have
             #push the new '|' nfa to the stack
-            nfaStack.append(NFA(initial, accept))
+            newNFA = NFA(initial, accept)
+            nfaStack.append(newNFA)
         elif c == '*':
             #pop only one nfa off the stack for '*'
             nfa= nfaStack.pop()  
             #create a new initial and accept state
             initial = state()
-            accept = state()
-            
+            accept = state()      
             #connect the intial state two the nfa initial state
             initial.edge1 = nfa.initial
             #connect the new initial state to the new accept state also
@@ -69,7 +70,8 @@ def compile(postfix):
             #connect the new old accept state to the new accept state
             nfa.accept.edge2 = accept
             #push the new '*' to the stack
-            nfaStack.append(NFA(initial, accept))
+            newNFA = NFA(initial, accept)
+            nfaStack.append(newNFA)
         #elif c == '+'
         #elif c == '-'
         #elif c == '%'
@@ -85,6 +87,7 @@ def compile(postfix):
             #create a new NFA object and puts it on the nfa stack
             #the initial state above and the accept state are used by the 
             #nfa constructor to create an nfa for a non special character
-            nfaStack.append(NFA(initial, accept))
+            newNFA = NFA(initial, accept)
+            nfaStack.append(newNFA)
 
 print('WORKS')
