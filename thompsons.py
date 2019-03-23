@@ -54,13 +54,25 @@ def compile(postfix):
             #push the new '|' nfa to the stack
             nfaStack.append(NFA(initial, accept))
         elif c == '*':
-
+            #pop only one nfa off the stack for '*'
+            nfa= nfaStack.pop()  
+            #create a new initial and accept state
+            initial = state()
+            accept = state()
+            
+            #connect the intial state two the nfa initial state
+            initial.edge1 = nfa.initial
+            #connect the new initial state to the new accept state also
+            initial.edge2 = accept
+            #connect the old accept to the old initial state
+            nfa.accept.edge1 = nfa.initial
+            #connect the new old accept state to the new accept state
+            nfa.accept.edge2 = accept
+            #push the new '*' to the stack
+            nfaStack.append(NFA(initial, accept))
         #elif c == '+'
         #elif c == '-'
         #elif c == '%'
-
-
-
         else:
             #creating a new instance of the state class
             accept = state()
