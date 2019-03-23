@@ -32,11 +32,27 @@ def compile(postfix):
             nfa1= nfaStack.pop()
             #combine the two states together
             nfa1.accept.edge1 = nfa2.initial
-            #push a new nfa onto the stack that is a combinaton of the two nfa's on the stack
+            #push a new nfa onto the stack that is a combinaton of the two nfa's that were on the stack
             #which is what the . means 'Concatenate'
+            #push the '.' nfa to the stack
             nfaStack.append(nfa1.initial, nfa2.accept)
         elif c == '|':
-            
+            #doesn't matter what order they are popped of for the or operator
+            nfa2= nfaStack.pop()
+            nfa1= nfaStack.pop()
+            #create two new instances of states
+            initial = state()
+            accept = state()
+            #create a new initial state for both nfa1 and nfa2
+            initial.edge1 = nfa1.initial
+            initial.edge2 = nfa2.initial
+            #create a new accept state for nfa1 and nfa2
+            nfa1.accept.edge1 = accept
+            nfa2.accept.edge1 = accept
+            #just like the drawn out example on paper
+            #for the or operator you put a new initial and accept state for whatever nfas you have
+            #push the new '|' nfa to the stack
+            nfaStack.append(NFA(initial, accept))
         elif c == '*':
 
         #elif c == '+'
