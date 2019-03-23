@@ -1,6 +1,5 @@
 #Thompson's Construction
 #Aaron Burns
-
 #No modifiers for classes in python
 class state:
     #Value None means you don't want to set a value yet
@@ -27,9 +26,8 @@ def compile(postfix):
     #for creating an nfa fragment for a non special character
     for c in postfix:
         if c == '.':
-            #stacks are LIFO 
-            nfa2= nfaStack.pop()
-            nfa1= nfaStack.pop()
+            #stacks are LIFO pop the last one off the stack first
+            nfa2, nfa1 = nfaStack.pop(), nfaStack.pop()
             #combine the two states together
             nfa1.accept.edge1 = nfa2.initial
             #push a new nfa onto the stack that is a combinaton of the two nfa's that were on the stack
@@ -39,17 +37,13 @@ def compile(postfix):
             nfaStack.append(newNFA)
         elif c == '|':
             #doesn't matter what order they are popped of for the or operator
-            nfa2= nfaStack.pop()
-            nfa1= nfaStack.pop()
+            nfa2, nfa1 = nfaStack.pop(), nfaStack.pop()
             #create two new instances of states
-            initial = state()
-            accept = state()
+            initial, accept = state(), state()
             #create a new initial state for both nfa1 and nfa2
-            initial.edge1 = nfa1.initial
-            initial.edge2 = nfa2.initial
+            initial.edge1, initial.edge2 = nfa1.initial, nfa2.initial
             #create a new accept state for nfa1 and nfa2
-            nfa1.accept.edge1 = accept
-            nfa2.accept.edge1 = accept
+            nfa1.accept.edge1, nfa2.accept.edge1 = accept, accept
             #just like the drawn out example on paper
             #for the or operator you put a new initial and accept state for whatever nfas you have
             #push the new '|' nfa to the stack
@@ -59,16 +53,13 @@ def compile(postfix):
             #pop only one nfa off the stack for '*'
             nfa= nfaStack.pop()  
             #create a new initial and accept state
-            initial = state()
-            accept = state()      
+            initial, accept = state(), state()   
             #connect the intial state two the nfa initial state
-            initial.edge1 = nfa.initial
             #connect the new initial state to the new accept state also
-            initial.edge2 = accept
+            initial.edge1, initial.edge2 = nfa.initial, accept
             #connect the old accept to the old initial state
-            nfa.accept.edge1 = nfa.initial
             #connect the new old accept state to the new accept state
-            nfa.accept.edge2 = accept
+            nfa.accept.edge1, nfa.accept.edge2 = nfa.initial, accept
             #push the new '*' to the stack
             newNFA = NFA(initial, accept)
             nfaStack.append(newNFA)
@@ -77,8 +68,7 @@ def compile(postfix):
         #elif c == '%'
         else:
             #creating a new instance of the state class
-            accept = state()
-            initial= state()
+            accept, initial = state(), state()
             #the state is called whatever character is read in
             initial.label = c
             #connects the initial state to the accept state
