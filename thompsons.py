@@ -22,7 +22,7 @@ def shunt(infix):
                 #removes last character from stack
             #run again to delete the closing bracket
             stack= stack[:-1]
-        #is the character in the dictionary
+        #if the character in the dictionary
         elif c in specials:
         #once you've read a special character
             while stack and specials.get(c, 0) <= specials.get(stack[-1],0):
@@ -38,7 +38,7 @@ def shunt(infix):
         #can do all in one line
         postfix, stack = postfix + stack[-1], stack[:-1]
     return postfix
-    
+
 #Thompson's Construction
 #Aaron Burns
 #No modifiers for classes in python
@@ -63,6 +63,7 @@ class NFA:
 
 #populate using the result of the shunting yard algroithm
 def compile(postfix):
+    """A function which creates NFA's from the postfix expressions created by the shunt function"""
     nfaStack = []
     #for creating an nfa fragment for a non special character
     for c in postfix:
@@ -122,5 +123,57 @@ def compile(postfix):
             nfaStack.append(newNFA)
     return nfaStack.pop()
 
-print(compile('ab.cd.|'))
-print(compile('aa.*'))
+def followes(state):
+    """Return the set of states that can be reached from state following edge arrows"""
+    #create a new set with state as it only member
+    states = set()
+    states.add(state)
+    #Checks if the state has arrows labled e from it
+    if state.label is None:
+        #check if edge1 is a state
+        if state.edge1 is not None:
+        #if there is an edge1 follow it
+        #union operator = |
+            states |= followes(state.edge1)
+        #check if edge2 is a state
+        if state.edge2 is not None:
+            #if there is an edge2 follow it
+            states |= followes(state.edge2)
+        #the only time there isn't an edge1 if for the accept state
+    return states
+
+def match(infix, string):
+    """Matches the string to the infix regular expression"""
+    #Shunt and compile the regular expression 
+    postfix = shunt(infix)
+    nfa = compile(postfix)
+    #The current set of states only one copy of an item allowed in a set
+    currentSet = set()
+    #The next set of states
+    nextSet = set()
+
+    #Add the initial state to the current set
+    currentSet |= followes(nfa.initial)
+
+    #loop through each character in the string 
+    for s in string:
+        #loop through the current set of states
+        for c in currentSet:
+            #check if that state is labelled 'x'
+            if c.label == s:
+                #add the edge1 state to the next set including all the states you can get to by following e arrows
+                nextSet |= followes(c.edge1)
+            #set the current state to next
+        currentSet = nextSet
+        #clear the next state
+        nextSet = set()
+        #checks if the accept state is in the current set of state
+    return (nfa.accept in currentSet)
+
+#TESTS
+infixes = ['a.b.c', 'a.(b|d).c', '(a.(b|d))', 'a.(b.b)*.c']
+strings = ['', 'abc', 'abbc', 'abcc', 'abad', 'abbbc']
+for i in infixes:
+    for s in strings:
+        print(match(i,s), i, s)
+
