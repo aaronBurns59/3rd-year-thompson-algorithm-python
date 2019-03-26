@@ -163,17 +163,29 @@ def match(infix, string):
             if c.label == s:
                 #add the edge1 state to the next set including all the states you can get to by following e arrows
                 nextSet |= followes(c.edge1)
-            #set the current state to next
+            # set the current state to next
         currentSet = nextSet
-        #clear the next state
+        # clear the next state
         nextSet = set()
-        #checks if the accept state is in the current set of state
+        # checks if the accept state is in the current set of state
     return (nfa.accept in currentSet)
 
-#TESTS
-infixes = ['a.b.c', 'a.(b|d).c', '(a.(b|d))', 'a.(b.b)*.c']
-strings = ['', 'abc', 'abbc', 'abcc', 'abad', 'abbbc']
-for i in infixes:
-    for s in strings:
-        print(match(i,s), i, s)
+# TESTS
+#tuple used to store test data
+test = [
+    ('a.b.c', ''),
+    ('a.(b|d).c', 'abc')
+]
+
+for exp, res in test:
+    print(match(exp, res), exp, res)
+#infixes = ['a.b.c', 'a.(b|d).c', '(a.(b|d))', 'a.(b.b)*.c']
+#strings = ['', 'abc', 'abbc', 'abcc', 'abad', 'abbbc']
+#
+#for expression, expected_output in zip(infixes, strings):
+#    print(match(expression, expected_output), expression, expected_output)
+
+#for i in infixes:
+#    for s in strings:
+#        print(match(i,s), i, s)
 
